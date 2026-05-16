@@ -5,6 +5,7 @@ import { ping, shutdown } from "./db.js";
 import { collectFx } from "./collectors/fx.js";
 import { collectIndices } from "./collectors/indices.js";
 import { collectNews } from "./collectors/news.js";
+import { collectMacro } from "./collectors/macro.js";
 
 type Job = { name: string; cron: string; run: () => Promise<number> };
 
@@ -12,6 +13,7 @@ const jobs: Job[] = [
   { name: "fx", cron: config.FX_CRON, run: collectFx },
   { name: "indices", cron: config.INDICES_CRON, run: collectIndices },
   { name: "news", cron: config.NEWS_CRON, run: collectNews },
+  { name: "macro", cron: config.MACRO_CRON, run: collectMacro },
 ];
 
 async function runOnce(): Promise<void> {

@@ -2,6 +2,7 @@ import YahooFinance from "yahoo-finance2";
 import { pool } from "../db.js";
 import { FX_SYMBOLS } from "../config.js";
 import { logger } from "../lib/logger.js";
+import { maybeAlert, type AlertCandidate } from "../lib/alerts.js";
 
 const yf = new YahooFinance({ suppressNotices: ["yahooSurvey"] });
 
@@ -45,6 +46,15 @@ export async function collectFx(): Promise<number> {
      ON CONFLICT (symbol, ts) DO NOTHING`,
     values,
   );
+
+  const candidates: AlertCandidate[] = rows.map((r) => ({
+    kind: "fx",
+    symbol: r.symbol,
+    display: r.symbol,
+    price: r.price,
+    changePct: r.change_pct,
+  }));
+  await maybeAlert(candidates);
 
   logger.info({ count: rows.length }, "fx: inserted");
   return rows.length;

@@ -1,0 +1,17 @@
+apiVersion: 1
+
+datasources:
+  - name: EconData
+    type: postgres
+    access: proxy
+    url: db:5432
+    user: econ
+    secureJsonData:
+      password: econ
+    jsonData:
+      database: econdata
+      sslmode: disable
+      postgresVersion: 1600
+      timescaledb: true
+    isDefault: true
+    editable: true

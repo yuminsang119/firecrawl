@@ -2,6 +2,7 @@ import YahooFinance from "yahoo-finance2";
 import { pool } from "../db.js";
 import { INDEX_SYMBOLS } from "../config.js";
 import { logger } from "../lib/logger.js";
+import { maybeAlert, type AlertCandidate } from "../lib/alerts.js";
 
 const yf = new YahooFinance({ suppressNotices: ["yahooSurvey"] });
 
@@ -55,6 +56,15 @@ export async function collectIndices(): Promise<number> {
      ON CONFLICT (symbol, ts) DO NOTHING`,
     values,
   );
+
+  const candidates: AlertCandidate[] = rows.map((r) => ({
+    kind: "index",
+    symbol: r.symbol,
+    display: r.name,
+    price: r.price,
+    changePct: r.change_pct,
+  }));
+  await maybeAlert(candidates);
 
   logger.info({ count: rows.length }, "indices: inserted");
   return rows.length;
